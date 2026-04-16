@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "checkJs": true,
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    // TODO: should probably be fixed to ES2023, or whatever standard is
+    // currently supported by the latest GJS
+    "target": "ESNext",
+    "outDir": "compiled_javascript",
+    "baseUrl": ".",
+    "paths": {
+      "*": ["*", "/nix/store/5y0l3gir9kgz94hma49n5lay6cpw3632-workbench-49.0/share/re.sonny.Workbench/langs/typescript/gi-types/*"]
+    },
+    "skipLibCheck": true
+  },
+  "include": [
+    "main.js",
+    "/nix/store/5y0l3gir9kgz94hma49n5lay6cpw3632-workbench-49.0/share/re.sonny.Workbench/langs/typescript/types/ambient.d.ts",
+    "/nix/store/5y0l3gir9kgz94hma49n5lay6cpw3632-workbench-49.0/share/re.sonny.Workbench/langs/typescript/gi-types/gi.d.ts"
+  ]
+}

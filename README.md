@@ -1,2 +1,2 @@
-# muncher
-Simple Minecraft launcher built using for the Gnome ecosystem
+# Muncher
+Minimalistic Minecraft launcher built for the GNOME ecosystem

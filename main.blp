@@ -1,0 +1,63 @@
+using Gtk 4.0;
+using Adw 1;
+
+template $SampleWindow: Adw.ApplicationWindow {
+  default-width: 300;
+  default-height: 150;
+  title: "Muncher";
+
+  Adw.ToolbarView {
+    [top]
+    Adw.HeaderBar {}
+
+    content: Box {
+      orientation: vertical;
+      halign: center;
+      valign: center;
+      hexpand: false;
+
+      Box {
+        margin-top: 6;
+        margin-bottom: 6;
+        orientation: vertical;
+        spacing: 6;
+
+        Adw.SplitButton {
+          label: "Play 1.20.11";
+          popover: button_popover;
+
+          styles [
+            "pill",
+            "suggested-action",
+          ]
+        }
+      }
+
+      Label {
+        label: "Logged in as Matpac";
+      }
+    };
+  }
+}
+
+Popover button_popover {
+  Box {
+    orientation: vertical;
+
+    SearchEntry {
+      placeholder-text: _("Select Version");
+    }
+
+    Adw.StatusPage {
+      title: _("Unable to access Minecraft API");
+      icon-name: "document-open-recent-symbolic";
+      width-request: 300;
+      height-request: 300;
+
+      styles [
+        "compact",
+        "dim-label",
+      ]
+    }
+  }
+}

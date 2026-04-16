@@ -1,0 +1,14 @@
+[project]
+name = "muncher"
+version = "0.0.1"
+description = "Minimalistic Minecraft launcher built for the GNOME ecosystem"
+readme = "README.md"
+requires-python = ">=3.13"
+scripts = { "start" = "python3 -m muncher.main" }
+
+dependencies = [
+  "minecraft-launcher-lib>=8.0",
+  "pycairo>=1.29.0",
+  "pygobject>=3.56.0",
+  "pygobject-stubs>=2.16.0",
+]
