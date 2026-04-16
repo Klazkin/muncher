@@ -8,7 +8,15 @@ template $SampleWindow: Adw.ApplicationWindow {
 
   Adw.ToolbarView {
     [top]
-    Adw.HeaderBar {}
+    Adw.HeaderBar {
+      [end]
+      MenuButton {
+        icon-name: "open-menu-symbolic";
+        menu-model: primary_menu;
+        tooltip-text: _("Main Menu");
+        primary: true;
+      }
+    }
 
     content: Box {
       orientation: vertical;
@@ -23,7 +31,7 @@ template $SampleWindow: Adw.ApplicationWindow {
         spacing: 6;
 
         Adw.SplitButton {
-          label: "Play 1.20.11";
+          label: "Play 26.1.0";
           popover: button_popover;
 
           styles [
@@ -33,8 +41,20 @@ template $SampleWindow: Adw.ApplicationWindow {
         }
       }
 
+      Adw.AboutDialog about {
+        developer-name: "Klazkin";
+        version: "0.0.1";
+      }
+
+      ProgressBar {
+        pulse-step: 0.2;
+        show-text: true;
+        text: "Downloading...";
+        fraction: 0.5;
+      }
+
       Label {
-        label: "Logged in as Matpac";
+        label: "Logged in as Klazkin";
       }
     };
   }
@@ -58,6 +78,20 @@ Popover button_popover {
         "compact",
         "dim-label",
       ]
+    }
+  }
+}
+
+Adw.AboutDialog about_dialog {
+  developer-name: "Klazkin";
+  version: "0.0.1";
+}
+
+menu primary_menu {
+  section {
+    item {
+      label: _("About Muncher");
+      action: "open-about";
     }
   }
 }
