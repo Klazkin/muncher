@@ -8,10 +8,12 @@
       system = "x86_64-linux"; # Standard 64-bit Linux
       pkgs = import nixpkgs { inherit system; };
     in {
-      devShells.${system}.default = pkgs.mkShell {
-        name = "python-uv-env";
+      devShells.${system}.default = pkgs.mkShell rec {
 
-        packages = with pkgs; [
+        name = "python-uv-env";
+        nativeBuildInputs = [ ];
+
+        buildInputs = with pkgs; [
           python3
           uv
           cmake
@@ -23,7 +25,17 @@
           libadwaita
           cambalache
           blueprint-compiler
+          # minecraft deps
+          libglvnd
+          libpulseaudio
+          udev
+          libX11
+          libXcursor
+          libXxf86vm
         ];
+
+        LD_LIBRARY_PATH =
+          pkgs.lib.makeLibraryPath (buildInputs ++ nativeBuildInputs);
       };
     };
 }
