@@ -1,3 +1,16 @@
+def compile_blueprint():
+    import os
+
+    print("starting compile")
+
+    os.system("rm main.ui")
+    os.system("blueprint-compiler compile main.blp >> main.ui")
+
+    print("finished compilation")
+
+
+compile_blueprint()
+
 import re
 import subprocess
 import sys
@@ -61,6 +74,11 @@ def login():
 
 
 if __name__ == "__main__":
+    app = Application()
+    app.run(sys.argv)
+
+    exit(0)
+
     assert load_dotenv()
 
     import minecraft_launcher_lib as mc
@@ -85,6 +103,3 @@ if __name__ == "__main__":
 
     print("process finished with", completed)
     # print(minecraft_command)
-
-    # app = Application()
-    # app.run(sys.argv)

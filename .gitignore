@@ -12,3 +12,6 @@ wheels/
 
 # env
 .env
+
+# generated ui
+main.ui

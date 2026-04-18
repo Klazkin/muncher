@@ -41,11 +41,6 @@ template $SampleWindow: Adw.ApplicationWindow {
         }
       }
 
-      Adw.AboutDialog about {
-        developer-name: "Klazkin";
-        version: "0.0.1";
-      }
-
       ProgressBar {
         pulse-step: 0.2;
         show-text: true;
@@ -54,7 +49,7 @@ template $SampleWindow: Adw.ApplicationWindow {
       }
 
       Label {
-        label: "Logged in as Klazkin";
+        label: "Logged in as Username";
       }
     };
   }
@@ -82,15 +77,15 @@ Popover button_popover {
   }
 }
 
-Adw.AboutDialog about_dialog {
-  developer-name: "Klazkin";
-  version: "0.0.1";
-}
-
 menu primary_menu {
   section {
     item {
       label: _("About Muncher");
+      action: "open-about";
+    }
+
+    item {
+      label: _("Preferences");
       action: "open-about";
     }
   }
