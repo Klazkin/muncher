@@ -1,7 +1,7 @@
 using Gtk 4.0;
 using Adw 1;
 
-template $SampleWindow: Adw.ApplicationWindow {
+template $MuncherWindow: Adw.ApplicationWindow {
   default-width: 300;
   default-height: 150;
   title: "Muncher";
@@ -30,7 +30,7 @@ template $SampleWindow: Adw.ApplicationWindow {
         orientation: vertical;
         spacing: 6;
 
-        Adw.SplitButton {
+        Adw.SplitButton button_play {
           label: "Play 26.1.0";
           popover: button_popover;
 
@@ -81,12 +81,12 @@ menu primary_menu {
   section {
     item {
       label: _("About Muncher");
-      action: "open-about";
+      action: "win.about";
     }
 
     item {
       label: _("Preferences");
-      action: "open-about";
+      action: "win.preferences";
     }
   }
 }
