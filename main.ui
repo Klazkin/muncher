@@ -49,14 +49,6 @@ corresponding .blp file and regenerate this file with blueprint-compiler.
               </object>
             </child>
             <child>
-              <object class="GtkProgressBar">
-                <property name="pulse-step">0.2</property>
-                <property name="show-text">true</property>
-                <property name="text">Downloading...</property>
-                <property name="fraction">0.5</property>
-              </object>
-            </child>
-            <child>
               <object class="GtkLabel">
                 <property name="label">Logged in as Username</property>
               </object>

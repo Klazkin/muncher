@@ -1,7 +1,8 @@
-import asyncio
 import os
 import subprocess
 import sys
+import threading
+import time
 
 import gi
 import minecraft_launcher_lib as mc
@@ -27,7 +28,7 @@ class Application(Adw.Application):
     def __init__(self, *args, **kwargs):
         super().__init__(
             *args,
-            application_id="org.example.App",
+            application_id="github.klazkin.muncher",
             **kwargs,
         )
 
@@ -40,15 +41,23 @@ class Application(Adw.Application):
 class MuncherWindow(Adw.ApplicationWindow):
     __gtype_name__ = "MuncherWindow"
 
-    button_play = Gtk.Template.Child()
+    button_play: Adw.SplitButton = Gtk.Template.Child()
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-        self.button_play.connect("clicked", on_play_pressed)
+        self.launch_task = None
+        self.button_play.connect("clicked", self.on_play_pressed)
+
+    def on_play_pressed(self, _):
+        self.button_play.set_label("Launching")
+        self.button_play.set_can_target(False)
+
+        thread = threading.Thread(target=start_game, args=[self], daemon=True)
+        thread.start()
 
 
-def on_play_pressed(_):
+def start_game(win: MuncherWindow):
     minecraft_directory = mc.utils.get_minecraft_directory()
     latest_version = mc.utils.get_latest_version()["release"]
 
@@ -60,8 +69,9 @@ def on_play_pressed(_):
         latest_version, minecraft_directory, options
     )
 
-    completed = subprocess.run(minecraft_command, start_new_session=True)
-    print("process finished with", completed)
+    subprocess.Popen(minecraft_command, start_new_session=True)
+    time.sleep(3)
+    win.close()
 
 
 def login():
