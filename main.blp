@@ -26,6 +26,7 @@ template $MuncherWindow: Adw.ApplicationWindow {
 
       Adw.SplitButton button_play {
         popover: button_popover;
+        hexpand: false;
 
         Box {
           Adw.ButtonContent button_play_content {
@@ -59,10 +60,11 @@ template $MuncherWindow: Adw.ApplicationWindow {
         ]
       }
 
-      ProgressBar {
+      ProgressBar install_progress_bar {
+        visible: false;
         pulse-step: 0.2;
         show-text: true;
-        fraction: 0.5;
+        fraction: 0.0;
       }
 
       Label {

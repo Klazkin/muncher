@@ -8,6 +8,7 @@ import gi
 import minecraft_launcher_lib as mc
 from dotenv import load_dotenv
 from gi.repository import Adw, Gio, GLib, Gtk
+from minecraft_launcher_lib.types import CallbackDict
 
 ### PRECOMPILE BLUEPRINT
 
@@ -52,6 +53,7 @@ class MuncherWindow(Adw.ApplicationWindow):
     button_play_spinner: Adw.Spinner = Gtk.Template.Child()
     button_popover: Gtk.Popover = Gtk.Template.Child()
     spinner_label: Gtk.Label = Gtk.Template.Child()
+    install_progress_bar: Gtk.ProgressBar = Gtk.Template.Child()
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -60,6 +62,7 @@ class MuncherWindow(Adw.ApplicationWindow):
         self.selected_version = mc.utils.get_latest_version()["release"]
         self.button_play.connect("clicked", self.on_play_pressed)
         self.button_play_content.set_label(f"Play {self.selected_version}")
+        self.progress_bar_max = 0
 
         action = Gio.SimpleAction.new("about", None)
         action.connect("activate", self.on_about)
@@ -69,7 +72,6 @@ class MuncherWindow(Adw.ApplicationWindow):
         self.button_play.set_sensitive(False)
         self.button_play_spinner.set_visible(True)
         self.button_play_content.set_visible(False)
-        self.spinner_label.set_label("Launching...")
 
         thread = threading.Thread(
             target=self.start_game,
@@ -90,10 +92,31 @@ class MuncherWindow(Adw.ApplicationWindow):
 
     def start_game(self):
         minecraft_directory = mc.utils.get_minecraft_directory()
+        self.progress_bar_max = 0  # reset
+
+        def set_status(status: str):
+            self.install_progress_bar.set_text(f"{status}...")
+
+        def set_progress(progress: int):
+            if self.progress_bar_max != 0:
+                self.install_progress_bar.set_visible(True)
+                self.install_progress_bar.set_fraction(progress / self.progress_bar_max)
+
+        def set_max(new_max: int):
+            self.progress_bar_max = new_max
+
+        install_callbacks: CallbackDict = {
+            "setStatus": set_status,
+            "setProgress": set_progress,
+            "setMax": set_max,
+        }
 
         self.spinner_label.set_label("Downloading...")
-        mc.install.install_minecraft_version(self.selected_version, minecraft_directory)
+        mc.install.install_minecraft_version(
+            self.selected_version, minecraft_directory, install_callbacks
+        )
         self.spinner_label.set_label("Launching...")
+        self.install_progress_bar.set_visible(False)
 
         options = mc.utils.generate_test_options()
 

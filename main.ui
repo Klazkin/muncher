@@ -33,6 +33,7 @@ corresponding .blp file and regenerate this file with blueprint-compiler.
             <child>
               <object class="AdwSplitButton" id="button_play">
                 <property name="popover">button_popover</property>
+                <property name="hexpand">false</property>
                 <child>
                   <object class="GtkBox">
                     <child>
@@ -72,10 +73,11 @@ corresponding .blp file and regenerate this file with blueprint-compiler.
               </object>
             </child>
             <child>
-              <object class="GtkProgressBar">
+              <object class="GtkProgressBar" id="install_progress_bar">
+                <property name="visible">false</property>
                 <property name="pulse-step">0.2</property>
                 <property name="show-text">true</property>
-                <property name="fraction">0.5</property>
+                <property name="fraction">0</property>
               </object>
             </child>
             <child>
