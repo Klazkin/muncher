@@ -9,9 +9,7 @@ import minecraft_launcher_lib as mc
 from dotenv import load_dotenv
 from gi.repository import Adw, Gio, GLib, Gtk
 
-assert load_dotenv()
-client_id = os.environ["CLIENT_ID"]
-redirect_uri = os.environ["REDIRECT_URI"]
+### PRECOMPILE BLUEPRINT
 
 print("Starting compilation")
 
@@ -20,8 +18,16 @@ os.system("blueprint-compiler compile main.blp >> main.ui")
 
 print("Finished compilation")
 
+### SETUP DOTENV
+
+assert load_dotenv()
+client_id = os.environ["CLIENT_ID"]
+redirect_uri = os.environ["REDIRECT_URI"]
+
 gi.require_version("Gtk", "4.0")
 gi.require_version("Adw", "1")
+
+### APPLICATION
 
 
 class Application(Adw.Application):
@@ -42,36 +48,62 @@ class MuncherWindow(Adw.ApplicationWindow):
     __gtype_name__ = "MuncherWindow"
 
     button_play: Adw.SplitButton = Gtk.Template.Child()
+    button_play_content: Adw.SplitButton = Gtk.Template.Child()
+    button_play_spinner: Adw.Spinner = Gtk.Template.Child()
+    button_popover: Gtk.Popover = Gtk.Template.Child()
+    spinner_label: Gtk.Label = Gtk.Template.Child()
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+        self.app: Application = kwargs["application"]
 
-        self.launch_task = None
+        self.selected_version = mc.utils.get_latest_version()["release"]
         self.button_play.connect("clicked", self.on_play_pressed)
+        self.button_play_content.set_label(f"Play {self.selected_version}")
+
+        action = Gio.SimpleAction.new("about", None)
+        action.connect("activate", self.on_about)
+        self.add_action(action)
 
     def on_play_pressed(self, _):
-        self.button_play.set_label("Launching")
-        self.button_play.set_can_target(False)
+        self.button_play.set_sensitive(False)
+        self.button_play_spinner.set_visible(True)
+        self.button_play_content.set_visible(False)
+        self.spinner_label.set_label("Launching...")
 
-        thread = threading.Thread(target=start_game, args=[self], daemon=True)
+        thread = threading.Thread(
+            target=self.start_game,
+            daemon=True,
+        )
         thread.start()
 
+    def on_about(self, *args):
+        dialog = Adw.AboutDialog(
+            application_name="Munhcer",
+            developer_name="Klazkin",
+            version="0.0.1",  # TODO extract from config
+            comments="Minimalistic Minecraft launcher built for the GNOME ecosystem",
+            license_type=Gtk.License.GPL_3_0_ONLY,
+        )
 
-def start_game(win: MuncherWindow):
-    minecraft_directory = mc.utils.get_minecraft_directory()
-    latest_version = mc.utils.get_latest_version()["release"]
+        dialog.present(self)
 
-    mc.install.install_minecraft_version(latest_version, minecraft_directory)
+    def start_game(self):
+        minecraft_directory = mc.utils.get_minecraft_directory()
 
-    options = mc.utils.generate_test_options()
+        self.spinner_label.set_label("Downloading...")
+        mc.install.install_minecraft_version(self.selected_version, minecraft_directory)
+        self.spinner_label.set_label("Launching...")
 
-    minecraft_command = mc.command.get_minecraft_command(
-        latest_version, minecraft_directory, options
-    )
+        options = mc.utils.generate_test_options()
 
-    subprocess.Popen(minecraft_command, start_new_session=True)
-    time.sleep(3)
-    win.close()
+        minecraft_command = mc.command.get_minecraft_command(
+            self.selected_version, minecraft_directory, options
+        )
+
+        subprocess.Popen(minecraft_command, start_new_session=True)
+        time.sleep(3)
+        self.app.quit()
 
 
 def login():

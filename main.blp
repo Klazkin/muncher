@@ -24,29 +24,47 @@ template $MuncherWindow: Adw.ApplicationWindow {
       valign: center;
       hexpand: false;
 
-      Box {
-        margin-top: 6;
-        margin-bottom: 6;
-        orientation: vertical;
-        spacing: 6;
+      Adw.SplitButton button_play {
+        popover: button_popover;
 
-        Adw.SplitButton button_play {
-          label: "Play 26.1.0";
-          popover: button_popover;
+        Box {
+          Adw.ButtonContent button_play_content {
+            label: "Play 0.0.0";
+            icon-name: "media-playback-start-symbolic";
+          }
 
-          styles [
-            "pill",
-            "suggested-action",
-          ]
+          Box button_play_spinner {
+            spacing: 6;
+            orientation: horizontal;
+            halign: center;
+            valign: center;
+            visible: false;
+
+            Adw.Spinner {
+              halign: center;
+              valign: center;
+              width-request: 16;
+              height-request: 16;
+            }
+
+            Label spinner_label {
+              label: "Spinning...";
+            }
+          }
         }
+
+        styles [
+          "pill",
+          "suggested-action",
+        ]
       }
 
-      // ProgressBar {
-      //   pulse-step: 0.2;
-      //   show-text: true;
-      //   text: "Downloading...";
-      //   fraction: 0.5;
-      // }
+      ProgressBar {
+        pulse-step: 0.2;
+        show-text: true;
+        fraction: 0.5;
+      }
+
       Label {
         label: "Logged in as Username";
       }
@@ -59,14 +77,14 @@ Popover button_popover {
     orientation: vertical;
 
     SearchEntry {
-      placeholder-text: _("Select Version");
+      placeholder-text: "Select Version";
     }
 
     Adw.StatusPage {
-      title: _("Unable to access Minecraft API");
+      title: "Unable to Access Minecraft API";
       icon-name: "document-open-recent-symbolic";
-      width-request: 300;
-      height-request: 300;
+      width-request: 250;
+      height-request: 400;
 
       styles [
         "compact",
