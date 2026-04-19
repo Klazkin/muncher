@@ -26,6 +26,7 @@
           libadwaita
           cambalache
           blueprint-compiler
+          webkitgtk_6_0
 
           # minecraft specific deps
           libglvnd

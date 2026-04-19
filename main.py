@@ -7,7 +7,7 @@ import time
 import gi
 import minecraft_launcher_lib as mc
 from dotenv import load_dotenv
-from gi.repository import Adw, Gio, GLib, Gtk
+from gi.repository import Adw, Gio, GLib, Gtk, WebKit
 from minecraft_launcher_lib.types import CallbackDict
 
 ### PRECOMPILE BLUEPRINT
@@ -15,7 +15,9 @@ from minecraft_launcher_lib.types import CallbackDict
 print("Starting compilation")
 
 os.system("rm main.ui")
+os.system("rm login.ui")
 os.system("blueprint-compiler compile main.blp >> main.ui")
+os.system("blueprint-compiler compile login.blp >> login.ui")
 
 print("Finished compilation")
 
@@ -40,8 +42,21 @@ class Application(Adw.Application):
         )
 
     def do_activate(self):
-        self.window: Adw.ApplicationWindow = MuncherWindow(application=self)
+        self.window: Adw.ApplicationWindow = LoginWindow(application=self)
         self.window.present()
+
+
+@Gtk.Template(filename="login.ui")
+class LoginWindow(Adw.ApplicationWindow):
+    __gtype_name__ = "LoginWindow"
+
+    web_view: WebKit.WebView = Gtk.Template.Child()
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+        login_url = mc.microsoft_account.get_login_url(client_id, redirect_uri)
+        self.web_view.load_uri(login_url)
 
 
 @Gtk.Template(filename="main.ui")
@@ -122,7 +137,6 @@ class MuncherWindow(Adw.ApplicationWindow):
         dialog.present(self)
 
     def start_game(self):
-
         self.progress_bar_max = 0  # reset
 
         def set_status(status: str):
