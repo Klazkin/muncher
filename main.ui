@@ -95,20 +95,55 @@ corresponding .blp file and regenerate this file with blueprint-compiler.
       <object class="GtkBox">
         <property name="orientation">1</property>
         <child>
-          <object class="GtkSearchEntry">
-            <property name="placeholder-text">Select Version</property>
-          </object>
-        </child>
-        <child>
           <object class="AdwStatusPage">
             <property name="title">Unable to Access Minecraft API</property>
             <property name="icon-name">document-open-recent-symbolic</property>
             <property name="width-request">250</property>
             <property name="height-request">400</property>
+            <property name="visible">false</property>
             <style>
               <class name="compact"/>
               <class name="dim-label"/>
             </style>
+          </object>
+        </child>
+        <child>
+          <object class="GtkScrolledWindow">
+            <property name="hscrollbar-policy">2</property>
+            <property name="propagate-natural-height">true</property>
+            <property name="has-frame">true</property>
+            <property name="valign">1</property>
+            <child>
+              <object class="GtkListView" id="version_list">
+                <property name="factory">
+                  <object class="GtkBuilderListItemFactory">
+                    <property name="bytes"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <template class="GtkListItem">
+    <property name="child">
+      <object class="GtkBox">
+        <child>
+          <object class="GtkLabel">
+            <binding name="label">
+              <lookup name="string" type="GtkStringObject">
+                <lookup name="item" type="GtkListItem">
+                  <constant>GtkListItem</constant>
+                </lookup>
+              </lookup>
+            </binding>
+            <property name="height-request">24</property>
+            <property name="margin-start">12</property>
+            <property name="margin-end">12</property>
+          </object>
+        </child>
+      </object>
+    </property>
+  </template>
+</interface>]]></property>
+                  </object>
+                </property>
+              </object>
+            </child>
           </object>
         </child>
       </object>

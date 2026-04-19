@@ -54,12 +54,28 @@ class MuncherWindow(Adw.ApplicationWindow):
     button_popover: Gtk.Popover = Gtk.Template.Child()
     spinner_label: Gtk.Label = Gtk.Template.Child()
     install_progress_bar: Gtk.ProgressBar = Gtk.Template.Child()
+    version_list: Gtk.ListView = Gtk.Template.Child()
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.app: Application = kwargs["application"]
 
+        self.minecraft_directory = mc.utils.get_minecraft_directory()
         self.selected_version = mc.utils.get_latest_version()["release"]
+        available_versions = mc.utils.get_available_versions(self.minecraft_directory)
+        available_versions_flat = list(map(lambda v: v["id"], available_versions))
+
+        self.version_list_model = Gtk.StringList.new(available_versions_flat)
+        self.version_select_model = Gtk.SingleSelection(model=self.version_list_model)
+        self.version_select_model.set_selected(
+            available_versions_flat.index(self.selected_version)
+        )
+
+        self.version_list.set_model(self.version_select_model)
+        self.version_select_model.connect(
+            "selection-changed", self.on_selection_changed
+        )
+
         self.button_play.connect("clicked", self.on_play_pressed)
         self.button_play_content.set_label(f"Play {self.selected_version}")
         self.progress_bar_max = 0
@@ -67,6 +83,20 @@ class MuncherWindow(Adw.ApplicationWindow):
         action = Gio.SimpleAction.new("about", None)
         action.connect("activate", self.on_about)
         self.add_action(action)
+
+    def on_selection_changed(self, *_):
+        selected_version = self.version_list_model.get_string(
+            self.version_select_model.get_selected()
+        )
+
+        if selected_version is None:
+            print(f"invalid version id {self.version_select_model.get_selected()}")
+            return
+
+        self.selected_version = selected_version
+        self.button_play_content.set_label(
+            f"Play {self.selected_version}"
+        )  # todo use connections to keep updated?
 
     def on_play_pressed(self, _):
         self.button_play.set_sensitive(False)
@@ -91,7 +121,7 @@ class MuncherWindow(Adw.ApplicationWindow):
         dialog.present(self)
 
     def start_game(self):
-        minecraft_directory = mc.utils.get_minecraft_directory()
+
         self.progress_bar_max = 0  # reset
 
         def set_status(status: str):
@@ -113,7 +143,7 @@ class MuncherWindow(Adw.ApplicationWindow):
 
         self.spinner_label.set_label("Downloading...")
         mc.install.install_minecraft_version(
-            self.selected_version, minecraft_directory, install_callbacks
+            self.selected_version, self.minecraft_directory, install_callbacks
         )
         self.spinner_label.set_label("Launching...")
         self.install_progress_bar.set_visible(False)
@@ -121,7 +151,7 @@ class MuncherWindow(Adw.ApplicationWindow):
         options = mc.utils.generate_test_options()
 
         minecraft_command = mc.command.get_minecraft_command(
-            self.selected_version, minecraft_directory, options
+            self.selected_version, self.minecraft_directory, options
         )
 
         subprocess.Popen(minecraft_command, start_new_session=True)

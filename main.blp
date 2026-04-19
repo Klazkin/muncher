@@ -77,21 +77,41 @@ template $MuncherWindow: Adw.ApplicationWindow {
 Popover button_popover {
   Box {
     orientation: vertical;
-
-    SearchEntry {
-      placeholder-text: "Select Version";
-    }
-
+    // SearchEntry {
+    //   placeholder-text: "Select Version";
+    // }
     Adw.StatusPage {
       title: "Unable to Access Minecraft API";
       icon-name: "document-open-recent-symbolic";
       width-request: 250;
       height-request: 400;
-
+      visible: false; // in case of an error?
       styles [
         "compact",
         "dim-label",
       ]
+    }
+
+    ScrolledWindow {
+      hscrollbar-policy: never;
+      propagate-natural-height: true;
+      has-frame: true;
+      valign: start;
+
+      ListView version_list {
+        factory: BuilderListItemFactory {
+          template ListItem {
+            child: Gtk.Box {
+              Gtk.Label {
+                label: bind template.item as <StringObject>.string;
+                height-request: 24;
+                margin-start: 12;
+                margin-end: 12;
+              }
+            };
+          }
+        };
+      }
     }
   }
 }

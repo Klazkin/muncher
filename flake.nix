@@ -14,6 +14,7 @@
         nativeBuildInputs = [ ];
 
         buildInputs = with pkgs; [
+          # development deps
           python3
           uv
           cmake
@@ -25,13 +26,15 @@
           libadwaita
           cambalache
           blueprint-compiler
-          # minecraft deps
+
+          # minecraft specific deps
           libglvnd
           libpulseaudio
           udev
           libX11
           libXcursor
           libXxf86vm
+          vulkan-loader
         ];
 
         LD_LIBRARY_PATH =
