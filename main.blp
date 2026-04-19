@@ -2,11 +2,14 @@ using Gtk 4.0;
 using Adw 1;
 
 template $MuncherWindow: Adw.ApplicationWindow {
-  default-width: 300;
-  default-height: 150;
+  default-width: 350;
+  default-height: 170;
   title: "Muncher";
 
   Adw.ToolbarView {
+    extend-content-to-bottom-edge: true;
+    extend-content-to-top-edge: true;
+
     [top]
     Adw.HeaderBar {
       [end]
@@ -18,8 +21,21 @@ template $MuncherWindow: Adw.ApplicationWindow {
       }
     }
 
-    content: Box {
-      orientation: vertical;
+    [bottom]
+    ActionBar action_bar {
+      revealed: true;
+      valign: end;
+
+      [center]
+      ProgressBar install_progress_bar {
+        visible: false;
+        pulse-step: 0.2;
+        show-text: true;
+        fraction: 0.0;
+      }
+    }
+
+    content: Adw.ToolbarView {
       halign: center;
       valign: center;
       hexpand: false;
@@ -59,17 +75,6 @@ template $MuncherWindow: Adw.ApplicationWindow {
           "suggested-action",
         ]
       }
-
-      ProgressBar install_progress_bar {
-        visible: false;
-        pulse-step: 0.2;
-        show-text: true;
-        fraction: 0.0;
-      }
-
-      Label {
-        label: "Logged in as Username";
-      }
     };
   }
 }
@@ -97,6 +102,7 @@ Popover button_popover {
       propagate-natural-height: true;
       has-frame: true;
       valign: start;
+      max-content-height: 400;
 
       ListView version_list {
         factory: BuilderListItemFactory {
