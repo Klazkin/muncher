@@ -51,7 +51,7 @@ class MuncherWindow(Adw.ApplicationWindow):
     button_play: Adw.SplitButton = Gtk.Template.Child()
     button_play_content: Adw.SplitButton = Gtk.Template.Child()
     button_play_spinner: Adw.Spinner = Gtk.Template.Child()
-    button_popover: Gtk.Popover = Gtk.Template.Child()
+    version_popover: Gtk.Popover = Gtk.Template.Child()
     spinner_label: Gtk.Label = Gtk.Template.Child()
     install_progress_bar: Gtk.ProgressBar = Gtk.Template.Child()
     version_list: Gtk.ListView = Gtk.Template.Child()
@@ -93,6 +93,7 @@ class MuncherWindow(Adw.ApplicationWindow):
             print(f"invalid version id {self.version_select_model.get_selected()}")
             return
 
+        self.version_popover.set_visible(False)
         self.selected_version = selected_version
         self.button_play_content.set_label(
             f"Play {self.selected_version}"

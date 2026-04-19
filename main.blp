@@ -41,7 +41,7 @@ template $MuncherWindow: Adw.ApplicationWindow {
       hexpand: false;
 
       Adw.SplitButton button_play {
-        popover: button_popover;
+        popover: version_popover;
         hexpand: false;
 
         Box {
@@ -79,7 +79,7 @@ template $MuncherWindow: Adw.ApplicationWindow {
   }
 }
 
-Popover button_popover {
+Popover version_popover {
   Box {
     orientation: vertical;
     // SearchEntry {
