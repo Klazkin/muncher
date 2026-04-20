@@ -24,8 +24,10 @@ print("Finished compilation")
 ### SETUP DOTENV
 
 assert load_dotenv()
-client_id = os.environ["CLIENT_ID"]
-redirect_uri = os.environ["REDIRECT_URI"]
+CLIENT_ID = os.environ["CLIENT_ID"]
+REDIRECT_HOST = os.environ["REDIRECT_HOST"]
+REDIRECT_PORT = int(os.environ["REDIRECT_PORT"])
+REDIRECT_URI = f"http://{REDIRECT_HOST}:{REDIRECT_PORT}"
 
 gi.require_version("Gtk", "4.0")
 gi.require_version("Adw", "1")
@@ -51,12 +53,53 @@ class LoginWindow(Adw.ApplicationWindow):
     __gtype_name__ = "LoginWindow"
 
     web_view: WebKit.WebView = Gtk.Template.Child()
+    browser_link: Gtk.LinkButton = Gtk.Template.Child()
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-        login_url = mc.microsoft_account.get_login_url(client_id, redirect_uri)
+        self.app: Application = kwargs["application"]
+
+        login_url = mc.microsoft_account.get_login_url(CLIENT_ID, REDIRECT_URI)
         self.web_view.load_uri(login_url)
+        self.browser_link.set_uri(login_url)
+
+        thread = threading.Thread(
+            target=self.listen_to_auth,
+            daemon=True,
+        )
+        thread.start()
+
+    def listen_to_auth(self):
+        import flask
+
+        app = flask.Flask(__name__)
+
+        @app.route("/", methods=["GET"])
+        def webhook():
+            code = flask.request.args["code"]
+
+            if not code:
+                return "Error! Something went wrong, code missing from redirect."
+
+            self.on_login_accepted(code)
+            return "Auth completed! Return may return to the launcher."  # TODO really fancy page that says the exact same thing
+
+        app.run(host=REDIRECT_HOST, port=REDIRECT_PORT)
+
+    def on_login_accepted(self, auth_code: str):
+        try:
+            login_result = mc.microsoft_account.complete_login(
+                CLIENT_ID, None, REDIRECT_URI, str(auth_code), None
+            )
+            print("login result:", login_result)
+        except Exception as e:
+            print("Login failed:", e)
+
+        ## todo fix this jank
+        self.app.window = MuncherWindow(application=self.app)
+        self.app.window.present()
+        self.close()
 
 
 @Gtk.Template(filename="main.ui")
@@ -172,26 +215,6 @@ class MuncherWindow(Adw.ApplicationWindow):
         subprocess.Popen(minecraft_command, start_new_session=True)
         time.sleep(3)
         self.app.quit()
-
-
-def login():
-    login_url = mc.microsoft_account.get_login_url(client_id, redirect_uri)
-    print("go to:", login_url)
-    redirect_url = input("redirect_url:")
-
-    if not mc.microsoft_account.url_contains_auth_code(redirect_url):
-        print("no code")
-        exit(-1)
-
-    auth_code = mc.microsoft_account.get_auth_code_from_url(redirect_url)
-
-    print("code:", auth_code)
-
-    login_result = mc.microsoft_account.complete_login(
-        client_id, None, redirect_uri, str(auth_code), None
-    )
-
-    return login_result
 
 
 if __name__ == "__main__":

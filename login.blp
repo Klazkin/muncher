@@ -37,6 +37,13 @@ template $LoginWindow: Adw.ApplicationWindow {
           }
         }
       }
+
+      LinkButton browser_link {
+        label: _("Open in browser.");
+        uri: "";
+        hexpand: false;
+        margin-bottom: 12;
+      }
     }
   }
 }
