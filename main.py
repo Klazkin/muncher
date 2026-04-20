@@ -24,6 +24,7 @@ print("Finished compilation")
 ### SETUP DOTENV
 
 assert load_dotenv()
+
 CLIENT_ID = os.environ["CLIENT_ID"]
 REDIRECT_HOST = os.environ["REDIRECT_HOST"]
 REDIRECT_PORT = int(os.environ["REDIRECT_PORT"])

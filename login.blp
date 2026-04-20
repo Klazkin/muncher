@@ -3,8 +3,8 @@ using Adw 1;
 using WebKit 6.0;
 
 template $LoginWindow: Adw.ApplicationWindow {
-  default-width: 700;
-  default-height: 700;
+  default-width: 550;
+  default-height: 650;
   resizable: false;
   title: "Muncher (Login)";
 
@@ -16,33 +16,29 @@ template $LoginWindow: Adw.ApplicationWindow {
       orientation: vertical;
 
       Label {
+        margin-bottom: 8;
         label: "Login using your Microsoft Account:";
       }
 
-      Adw.Clamp {
-        maximum-size: 700;
+      Frame {
+        margin-start: 16;
+        margin-end: 16;
 
-        Frame {
-          margin-top: 18;
-          margin-bottom: 18;
+        WebKit.WebView web_view {
+          vexpand: true;
+          hexpand: true;
 
-          WebKit.WebView web_view {
-            zoom-level: 0.8;
-            vexpand: true;
-            hexpand: true;
-
-            styles [
-              "view",
-            ]
-          }
+          styles [
+            "view",
+          ]
         }
       }
 
       LinkButton browser_link {
-        label: _("Open in browser.");
+        label: _("Open in browser");
         uri: "";
-        hexpand: false;
-        margin-bottom: 12;
+        margin-top: 8;
+        margin-bottom: 8;
       }
     }
   }
