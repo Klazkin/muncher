@@ -95,6 +95,7 @@ class LoginWindow(Adw.ApplicationWindow):
             print("login result:", login_result)
         except Exception as e:
             print("Login failed:", e)
+            raise RuntimeError("Login failure.")
 
         ## todo fix this jank
         self.app.window = MuncherWindow(application=self.app)
