@@ -83,7 +83,7 @@ class LoginWindow(Adw.ApplicationWindow):
                 return "Error! Something went wrong, code missing from redirect."
 
             self.on_login_accepted(code)
-            return "Auth completed! Return may return to the launcher."  # TODO really fancy page that says the exact same thing
+            return "Auth completed! You may return to the launcher."  # TODO really fancy page that says the exact same thing
 
         app.run(host=REDIRECT_HOST, port=REDIRECT_PORT)
 
