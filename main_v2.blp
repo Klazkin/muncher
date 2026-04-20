@@ -1,0 +1,126 @@
+using Gtk 4.0;
+using Adw 1;
+
+template $MainV2: Adw.ApplicationWindow {
+  title: "Muncher";
+  width-request: 360;
+  height-request: 300;
+  default-width: 640;
+  default-height: 480;
+
+  Adw.Breakpoint {
+    condition ("max-width: 400sp")
+
+    setters {
+      split_view.collapsed: true;
+      button.visible: true;
+    }
+  }
+
+  content: Adw.NavigationSplitView split_view {
+    sidebar: Adw.NavigationPage {
+      title: "Profiles";
+      tag: "sidebar";
+
+      child: Adw.ToolbarView {
+        [top]
+        Adw.HeaderBar {
+          show-title: true;
+
+          [start]
+          MenuButton {
+            icon-name: "edit-find-symbolic";
+            menu-model: primary_menu; // todo update model and button type
+            tooltip-text: "Search Profiles";
+          }
+
+          [end]
+          MenuButton {
+            icon-name: "open-menu-symbolic";
+            menu-model: primary_menu;
+            tooltip-text: "Main Menu";
+            primary: true;
+          }
+        }
+
+        [bottom]
+        Box bottom {
+          margin-bottom: 8;
+          margin-start: 16;
+          margin-end: 16;
+          spacing: 8;
+          orientation: vertical;
+
+          Separator {}
+
+          Label {
+            label: "Logged in as Matpac";
+          }
+        }
+
+        content: Box {
+          orientation: vertical;
+
+          Button button {
+            visible: false;
+            halign: center;
+            can-shrink: true;
+            label: _("Open Content");
+            action-name: "navigation.push";
+            action-target: "'content'";
+
+            styles [
+              "pill",
+            ]
+          }
+        };
+      };
+    };
+
+    content: Adw.NavigationPage {
+      title: "Muncher";
+      tag: "content";
+
+      child: Adw.ToolbarView {
+        [top]
+        Adw.HeaderBar {
+          show-title: true;
+        }
+
+        content: Adw.StatusPage {
+          title: "Latest Release";
+          description: "Last played: Yesterday";
+
+          Button {
+            can-shrink: true;
+            halign: center;
+
+            Adw.ButtonContent button_play_content {
+              label: "Play";
+              icon-name: "media-playback-start-symbolic";
+            }
+
+            styles [
+              "pill",
+              "suggested-action",
+            ]
+          }
+        };
+      };
+    };
+  };
+}
+
+menu primary_menu {
+  section {
+    item {
+      label: _("About Muncher");
+      action: "win.about";
+    }
+
+    item {
+      label: _("Preferences");
+      action: "win.preferences";
+    }
+  }
+}

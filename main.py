@@ -14,10 +14,11 @@ from minecraft_launcher_lib.types import CallbackDict
 
 print("Starting compilation")
 
-os.system("rm main.ui")
-os.system("rm login.ui")
-os.system("blueprint-compiler compile main.blp >> main.ui")
-os.system("blueprint-compiler compile login.blp >> login.ui")
+blueprints = ["main", "login", "main_v2"]
+
+for b in blueprints:
+    os.system(f"rm {b}.ui")
+    os.system(f"blueprint-compiler compile {b}.blp >> {b}.ui")
 
 print("Finished compilation")
 
@@ -45,8 +46,16 @@ class Application(Adw.Application):
         )
 
     def do_activate(self):
-        self.window: Adw.ApplicationWindow = LoginWindow(application=self)
+        self.window: Adw.ApplicationWindow = MainV2(application=self)
         self.window.present()
+
+
+@Gtk.Template(filename="main_v2.ui")
+class MainV2(Adw.ApplicationWindow):
+    __gtype_name__ = "MainV2"
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
 
 
 @Gtk.Template(filename="login.ui")
