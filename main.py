@@ -1,3 +1,4 @@
+import json
 import os
 import subprocess
 import sys
@@ -6,21 +7,21 @@ import time
 
 import gi
 import minecraft_launcher_lib as mc
+import usersettings
 from dotenv import load_dotenv
-from gi.repository import Adw, Gio, GLib, Gtk, WebKit
-from minecraft_launcher_lib.types import CallbackDict
+from gi.repository import Adw, Gio, Gtk, WebKit
+from minecraft_launcher_lib.types import CallbackDict, MinecraftOptions
+
+APP_ID = "github.klazkin.muncher"
 
 ### PRECOMPILE BLUEPRINT
-
-print("Starting compilation")
 
 blueprints = ["main", "login", "main_v2"]
 
 for b in blueprints:
+    print(f"compiling: {b}")
     os.system(f"rm {b}.ui")
     os.system(f"blueprint-compiler compile {b}.blp >> {b}.ui")
-
-print("Finished compilation")
 
 ### SETUP DOTENV
 
@@ -34,6 +35,17 @@ REDIRECT_URI = f"http://{REDIRECT_HOST}:{REDIRECT_PORT}"
 gi.require_version("Gtk", "4.0")
 gi.require_version("Adw", "1")
 
+### SETTINGS
+
+s = usersettings.Settings(APP_ID)
+s.add_setting("config_version", int, "1")
+s.add_setting("username", str, "")
+s.add_setting("token", str, "")
+s.add_setting("uuid", str, "")
+s.load_settings()
+
+print(f"Settings {s}")
+
 ### APPLICATION
 
 
@@ -41,12 +53,17 @@ class Application(Adw.Application):
     def __init__(self, *args, **kwargs):
         super().__init__(
             *args,
-            application_id="github.klazkin.muncher",
+            application_id=APP_ID,
             **kwargs,
         )
 
     def do_activate(self):
-        self.window: Adw.ApplicationWindow = MainV2(application=self)
+        # self.window: Adw.ApplicationWindow = (  # this is a crime, ideally should check againts MS api if token is valid?
+        #     MuncherWindow(application=self)
+        #     if s.token
+        #     else LoginWindow(application=self)
+        # )
+        self.window: Adw.ApplicationWindow = LoginWindow(application=self)
         self.window.present()
 
 
@@ -102,7 +119,12 @@ class LoginWindow(Adw.ApplicationWindow):
             login_result = mc.microsoft_account.complete_login(
                 CLIENT_ID, None, REDIRECT_URI, str(auth_code), None
             )
-            print("login result:", login_result)
+            print("got good login result:", login_result)
+            s.username = login_result["name"]
+            s.token = login_result["access_token"]
+            s.uuid = login_result["id"]
+            s.save_settings()
+
         except Exception as e:
             print("Login failed:", e)
             raise RuntimeError("Login failure.")
@@ -194,7 +216,9 @@ class MuncherWindow(Adw.ApplicationWindow):
         self.progress_bar_max = 0  # reset
 
         def set_status(status: str):
-            self.install_progress_bar.set_text(f"{status}...")
+            self.install_progress_bar.set_text(
+                f"{status.split(' ')[0]}..."
+            )  # FIXME hack
 
         def set_progress(progress: int):
             if self.progress_bar_max != 0:
@@ -217,7 +241,16 @@ class MuncherWindow(Adw.ApplicationWindow):
         self.spinner_label.set_label("Launching...")
         self.install_progress_bar.set_visible(False)
 
-        options = mc.utils.generate_test_options()
+        # FIXME create separate debug mode
+        # options = mc.utils.generate_test_options()
+        #
+        #
+        options: MinecraftOptions = {
+            "username": s.username,
+            "token": s.token,
+            "launcherName": "muncher",
+            "uuid": s.uuid,
+        }
 
         minecraft_command = mc.command.get_minecraft_command(
             self.selected_version, self.minecraft_directory, options

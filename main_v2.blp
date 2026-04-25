@@ -27,40 +27,18 @@ template $MainV2: Adw.ApplicationWindow {
 
       child: Adw.ToolbarView {
         [top]
-        Overlay {
-          Adw.HeaderBar {
-            show-title: bind button_search.active inverted;
-
-            [start]
-            ToggleButton button_search {
-              icon-name: "edit-find-symbolic";
-              visible: bind button_search.active inverted;
-              // action-name: "focus";
-              // action-target: 'searchentry';
-            }
-
-            [end]
-            Button {
-              visible: bind button_search.active inverted;
-              icon-name: "list-add-symbolic";
-            }
+        Adw.HeaderBar {
+          [start]
+          Button {
+            icon-name: "list-add-symbolic";
           }
 
-          [overlay]
-          Revealer revealer_slide {
-            transition-duration: 300;
-            transition-type: slide_down;
-            reveal-child: bind button_search.active;
-            can-target: bind button_search.active;
-
-            SearchEntry searchentry {
-              margin-top: 8;
-              margin-bottom: 8;
-              margin-start: 8;
-              margin-end: 8;
-              search-delay: 100;
-              placeholder-text: "Search profiles";
-            }
+          [end]
+          MenuButton {
+            icon-name: "open-menu-symbolic";
+            menu-model: primary_menu;
+            tooltip-text: "Main Menu";
+            primary: true;
           }
         }
 
@@ -126,18 +104,10 @@ template $MainV2: Adw.ApplicationWindow {
         Adw.HeaderBar {
           show-title: true;
 
-          [start]
+          [end]
           Button {
             icon-name: "org.gnome.Settings-symbolic";
             tooltip-text: "Edit profile";
-          }
-
-          [end]
-          MenuButton {
-            icon-name: "open-menu-symbolic";
-            menu-model: primary_menu;
-            tooltip-text: "Main Menu";
-            primary: true;
           }
         }
 

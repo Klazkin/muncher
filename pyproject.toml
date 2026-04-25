@@ -13,4 +13,5 @@ dependencies = [
   "pycairo>=1.29.0",
   "pygobject>=3.56.0",
   "pygobject-stubs>=2.16.0",
+  "usersettings>=1.1.5",
 ]
