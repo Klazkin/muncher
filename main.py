@@ -7,10 +7,11 @@ import time
 
 import gi
 import minecraft_launcher_lib as mc
-import usersettings
 from dotenv import load_dotenv
 from gi.repository import Adw, Gio, Gtk, WebKit
 from minecraft_launcher_lib.types import CallbackDict, MinecraftOptions
+
+from user_data import UserData, save, user_data
 
 APP_ID = "github.klazkin.muncher"
 
@@ -35,16 +36,6 @@ REDIRECT_URI = f"http://{REDIRECT_HOST}:{REDIRECT_PORT}"
 gi.require_version("Gtk", "4.0")
 gi.require_version("Adw", "1")
 
-### SETTINGS
-
-s = usersettings.Settings(APP_ID)
-s.add_setting("config_version", int, "1")
-s.add_setting("username", str, "")
-s.add_setting("token", str, "")
-s.add_setting("uuid", str, "")
-s.load_settings()
-
-print(f"Settings {s}")
 
 ### APPLICATION
 
@@ -58,12 +49,12 @@ class Application(Adw.Application):
         )
 
     def do_activate(self):
-        # self.window: Adw.ApplicationWindow = (  # this is a crime, ideally should check againts MS api if token is valid?
-        #     MuncherWindow(application=self)
-        #     if s.token
-        #     else LoginWindow(application=self)
-        # )
-        self.window: Adw.ApplicationWindow = LoginWindow(application=self)
+        self.window: Adw.ApplicationWindow = (
+            MuncherWindow(application=self)
+            if user_data  # this is a crime, ideally should check againts MS api if token is valid?
+            else LoginWindow(application=self)
+        )
+
         self.window.present()
 
 
@@ -119,11 +110,14 @@ class LoginWindow(Adw.ApplicationWindow):
             login_result = mc.microsoft_account.complete_login(
                 CLIENT_ID, None, REDIRECT_URI, str(auth_code), None
             )
-            print("got good login result:", login_result)
-            s.username = login_result["name"]
-            s.token = login_result["access_token"]
-            s.uuid = login_result["id"]
-            s.save_settings()
+            print("logged in")
+            login_data: UserData = {
+                "username": login_result["name"],
+                "token": login_result["access_token"],
+                "uuid": login_result["id"],
+                "data_version": 1,
+            }
+            save(login_data)
 
         except Exception as e:
             print("Login failed:", e)
@@ -243,13 +237,15 @@ class MuncherWindow(Adw.ApplicationWindow):
 
         # FIXME create separate debug mode
         # options = mc.utils.generate_test_options()
-        #
-        #
+
+        if user_data is None:
+            raise RuntimeError("UserData cannot be null")
+
         options: MinecraftOptions = {
-            "username": s.username,
-            "token": s.token,
             "launcherName": "muncher",
-            "uuid": s.uuid,
+            "username": user_data["username"],
+            "uuid": user_data["uuid"],
+            "token": user_data["token"],
         }
 
         minecraft_command = mc.command.get_minecraft_command(
