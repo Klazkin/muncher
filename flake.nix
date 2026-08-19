@@ -36,6 +36,12 @@
           libXcursor
           libXxf86vm
           vulkan-loader
+
+          # old versions
+          libxext
+          libxrender
+          libxtst
+          libxi
         ];
 
         LD_LIBRARY_PATH =

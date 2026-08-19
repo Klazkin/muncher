@@ -17,7 +17,7 @@ DATA_FILE = "data.json"
 DATA_PATH = dirs.user_data_path / DATA_FILE
 user_data: None | UserData = None
 
-
+# load
 try:
     with open(DATA_PATH) as f:
         as_json = json.load(f)
